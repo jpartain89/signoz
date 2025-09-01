@@ -9,6 +9,16 @@ receivers:
       disk: {}
       filesystem: {}
       network: {}
+  filelog:
+    include: [/var/lib/docker/containers/*/*-json.log]
+    poll_interval: 200ms
+    start_at: end
+    include_file_name: false
+    include_file_path: false
+    operators:
+      - id: container-parser
+        type: container
+        format: docker
   otlp:
     protocols:
       grpc:
@@ -136,4 +146,8 @@ service:
     logs:
       receivers: [otlp, tcplog/docker]
       processors: [resourcedetection, batch]
+      exporters: [otlp]
+    file_logs:
+      receivers: [otlp, filelog]
+      processors: [batch]
       exporters: [otlp]
